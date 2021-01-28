@@ -11,6 +11,7 @@ from linebot.models import *
 
 #models.py資料表
 from botapp.models import *
+from botapp.flex import *
 
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
@@ -19,12 +20,11 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 @csrf_exempt
 def callback(request):
     if request.method == 'POST':
-        #先設定一個要回傳的message空集合
+        #建立message list
         message=[]
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
-        
-        #在這裡將body寫入機器人回傳的訊息中，可以更容易看出你收到的webhook長怎樣#
+
         message.append(TextSendMessage(text=str(body)))
 
         try:
@@ -35,36 +35,16 @@ def callback(request):
             return HttpResponseBadRequest()
 
         for event in events:
-            #如果事件為訊息
             if isinstance(event, MessageEvent):
                 print(event.message.type)
                 if event.message.type=='text':
-                    message=TextSendMessage(
-                        text="文字訊息",
-                        quick_reply=QuickReply(
-                            items=[
-                                QuickReplyButton(
-                                    action=PostbackAction(label="Postback",data="回傳資料")
-                                    ),
-                                QuickReplyButton(
-                                    action=MessageAction(label="文字訊息",text="回傳文字")
-                                    ),
-                                QuickReplyButton(
-                                    action=DatetimePickerAction(label="時間選擇",data="時間選擇",mode='datetime')
-                                    ),
-                                QuickReplyButton(
-                                    action=CameraAction(label="拍照")
-                                    ),
-                                QuickReplyButton(
-                                    action=CameraRollAction(label="相簿")
-                                    ),
-                                QuickReplyButton(
-                                    action=LocationAction(label="傳送位置")
-                                    )
-                                ]
-                            )
-                        )
-                    line_bot_api.reply_message(event.reply_token,message)
+                    mtext = event.message.text
+                    if 'test' in mtext:
+                        message.append(flex_example())
+                        line_bot_api.reply_message(event.reply_token,message)
+                    else:
+                        message.append(TextSendMessage(text='文字訊息'))
+                        line_bot_api.reply_message(event.reply_token,message)
 
                 elif event.message.type=='image':
                     message.append(TextSendMessage(text='圖片訊息'))
@@ -116,6 +96,7 @@ def callback(request):
 
             elif isinstance(event, PostbackEvent):
                 print('PostbackEvent')
+
 
         return HttpResponse()
     else:
