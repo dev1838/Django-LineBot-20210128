@@ -16,9 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
+
 from botapp import views
+
+#import static
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url('^callback', views.callback),
 ]
+
+#加入這一行
+urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
