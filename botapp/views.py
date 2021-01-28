@@ -13,6 +13,8 @@ from linebot.models import *
 from botapp.models import *
 from botapp.flex import *
 from botapp.image_processing import *
+from botapp.superpix import *
+
 
 import string
 import random
@@ -63,17 +65,17 @@ def callback(request):
                     #將原圖存為灰階、二值化圖片
                     gray,binary,contour = image_processing_1(image_name,path)
 
-                    domain = 'b3c4322ec312.ngrok.io'
+                    domain = 'c74f160c6d3f.ngrok.io'
 
-                    gray = 'https://'+domain+gray[1:]
-                    binary = 'https://'+domain+binary[1:]
-                    contour = 'https://'+domain+contour[1:]
+                    slic = SLIC(image_name,path)
+                    seed = SEEDS(image_name,path)
+                    lsc = LSC(image_name,path)
 
-                    message.append(ImageSendMessage(original_content_url=gray,preview_image_url=gray))
-                    message.append(ImageSendMessage(original_content_url=binary,preview_image_url=binary))
-                    message.append(ImageSendMessage(original_content_url=contour,preview_image_url=contour))
-
+                    message.append(ImageSendMessage(original_content_url=slic,preview_image_url=slic))
+                    message.append(ImageSendMessage(original_content_url=seed,preview_image_url=seed))
+                    message.append(ImageSendMessage(original_content_url=lsc,preview_image_url=lsc))
                     line_bot_api.reply_message(event.reply_token,message)
+
 
                 elif event.message.type=='location':
                     message.append(TextSendMessage(text='位置訊息'))
