@@ -61,12 +61,18 @@ def callback(request):
                             fd.write(chunk)
     
                     #將原圖存為灰階、二值化圖片
-                    gray,binary = image_processing_1(image_name,path)
-                    domain = 'b6fad674acab.ngrok.io'
+                    gray,binary,contour = image_processing_1(image_name,path)
+
+                    domain = 'b3c4322ec312.ngrok.io'
+
                     gray = 'https://'+domain+gray[1:]
                     binary = 'https://'+domain+binary[1:]
+                    contour = 'https://'+domain+contour[1:]
+
                     message.append(ImageSendMessage(original_content_url=gray,preview_image_url=gray))
                     message.append(ImageSendMessage(original_content_url=binary,preview_image_url=binary))
+                    message.append(ImageSendMessage(original_content_url=contour,preview_image_url=contour))
+
                     line_bot_api.reply_message(event.reply_token,message)
 
                 elif event.message.type=='location':
