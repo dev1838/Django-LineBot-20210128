@@ -15,6 +15,9 @@ from botapp.flex import *
 from botapp.image_processing import *
 from botapp.superpix import *
 
+#import speech_recognition及pydub套件
+import speech_recognition as sr
+from pydub import AudioSegment
 
 import string
 import random
@@ -92,6 +95,24 @@ def callback(request):
 
                 elif event.message.type=='audio':
                     message.append(TextSendMessage(text='聲音訊息'))
+                    audio_content = line_bot_api.get_message_content(event.message.id)
+                    path='./static/sound.m4a'
+                    with open(path, 'wb') as fd:
+                        for chunk in audio_content.iter_content():
+                            fd.write(chunk)
+
+                    #進行語音轉文字處理
+                    r = sr.Recognizer()
+                    AudioSegment.converter = 'C:\\ffmpeg\\bin\\ffmpeg.exe'#輸入自己的ffmpeg.exe路徑
+                    sound = AudioSegment.from_file_using_temporary_files(path)
+                    path = os.path.splitext(path)[0]+'.wav'
+                    sound.export(path, format="wav")
+                    with sr.AudioFile(path) as source:
+                        audio = r.record(source)
+                    text = r.recognize_google(audio,language='zh-Hant')#設定要以什麼文字轉換
+
+                    #將轉換的文字回傳給用戶
+                    message.append(TextSendMessage(text=text))
                     line_bot_api.reply_message(event.reply_token,message)
 
                 elif event.message.type=='file':

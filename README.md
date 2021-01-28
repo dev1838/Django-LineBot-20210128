@@ -11,4 +11,8 @@ $ pip install virtualenv
 (venv)$ pip install opencv-python opencv-contrib-python 
 (venv)$ pip install numpy
 
+(venv)$ pip install SpeechRecognition pydub
+
+(venv)$ pip install ffmpeg
+
 * views.py and superpix need to change the ngrok domain
