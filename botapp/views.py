@@ -12,6 +12,7 @@ from linebot.models import *
 #models.py資料表
 from botapp.models import *
 from botapp.flex import *
+from botapp.flex import *
 
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
@@ -36,11 +37,25 @@ def callback(request):
 
         for event in events:
             if isinstance(event, MessageEvent):
-                print(event.message.type)
+                #print(event.message.type)
+                message=[]
+                uid=event.source.user_id
+                profile=line_bot_api.get_profile(uid)
+                name=profile.display_name
                 if event.message.type=='text':
                     mtext = event.message.text
-                    if 'test' in mtext:
-                        message.append(flex_example())
+                    if 'jobs' in mtext:
+                            job = mtext.split(',')
+                            Jobs.objects.create(uid=uid,
+                                                name=name,
+                                                job_name=job[1],
+                                                percentage=job[2],
+                                                description=job[3])
+                            message.append(TextSendMessage(text='收到的工作內容為：'+str(job)))
+                            message.append(TextSendMessage(text='建立工作內容完成'))
+                            line_bot_api.reply_message(event.reply_token,message)
+                    elif "工作查詢" in mtext:
+                        message.append(jobs_progress(uid))
                         line_bot_api.reply_message(event.reply_token,message)
                     else:
                         message.append(TextSendMessage(text='文字訊息'))
