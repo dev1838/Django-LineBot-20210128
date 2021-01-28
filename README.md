@@ -15,4 +15,7 @@ $ pip install virtualenv
 
 (venv)$ pip install ffmpeg
 
+(venv)$ pip install gTTS
+
+
 * views.py and superpix need to change the ngrok domain
